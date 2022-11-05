@@ -11,12 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmControllerTest {
     @Test
     public void testDuration(){
-       Film film = new Film();
-       film.setDuration(0);
-       film.setDescription("123");
-       film.setName("abc");
+       Film film = new Film("abc","123",LocalDate.of(2022,10,10),0);
        film.setId(1);
-       film.setReleaseDate(LocalDate.of(2022,10,10));
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> FilmController.validate(film));
@@ -24,12 +20,8 @@ class FilmControllerTest {
     }
     @Test
     public void testDate(){
-        Film film = new Film();
-        film.setDuration(10);
-        film.setDescription("123");
-        film.setName("abc");
+        Film film = new Film("abc","123",LocalDate.of(1895, 12, 27),10);
         film.setId(1);
-        film.setReleaseDate(LocalDate.of(1895, 12, 27));
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> FilmController.validate(film));

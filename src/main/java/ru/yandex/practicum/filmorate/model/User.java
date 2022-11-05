@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -21,4 +22,5 @@ public class User {
     @NotNull
     @PastOrPresent
     private final LocalDate birthday;
+
 }
