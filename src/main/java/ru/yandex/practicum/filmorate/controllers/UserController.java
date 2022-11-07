@@ -22,41 +22,39 @@ public class UserController {
         return users.values();
     }
     @PostMapping
-    public User create(@Valid @RequestBody User user){
-        try {
-            validate(user);
-            if (!users.containsKey(user.getId())) {
-                user.setId(id++);
-                users.put(user.getId(), user);
-                log.info("Пользователь " + user.getLogin() + " добавлен");
-            } else{
-                log.info("Такой пользователь уже добавлен");
-            }
-        } catch (Exception e){
-            log.info("Ошибка добавления пользователя");
+    public User create(@Valid @RequestBody User user) throws ValidationException {
+
+        validate(user);
+        if (!users.containsKey(user.getId())) {
+            user.setId(id++);
+            users.put(user.getId(), user);
+            log.info("Пользователь " + user.getLogin() + " добавлен");
+            return user;
+        } else {
+            log.warn(user.getLogin());
+            throw new ValidationException("Такой пользователь уже добавлен");
         }
-        return user;
     }
 
+
+
     @PutMapping
-    public User put(@RequestBody User user){
-        try {
+    public User put(@RequestBody User user) throws ValidationException {
             validate(user);
             if (users.containsKey(user.getId())) {
                 users.remove(user.getId());
                 users.put(user.getId(), user);
                 log.info("Информация о пользователе обновлена");
+                return user;
             } else {
-                log.info("Нет такого пользователя");
+                log.warn("Нет такого пользователя");
+                log.info(user.getLogin());
+                throw new ValidationException("Нет такого пользователя");
             }
-        } catch (ValidationException e){
-            log.info("Ошибка при обновлении данных пользователя");
-        }
-        return user;
     }
     public static void validate(@Valid @RequestBody User user) throws ValidationException {
         if (user.getLogin().contains(" ")){
-            log.info("User login = "+user.getLogin());
+            log.warn("User login = "+user.getLogin());
             throw new ValidationException("Логин содержит пробел");
         }
         if (user.getName()==null){

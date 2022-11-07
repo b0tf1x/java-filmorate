@@ -25,42 +25,44 @@ private Map<Integer,Film> films = new HashMap<>();
         return films.values();
     }
     @PostMapping
-    public Film create(@Valid @RequestBody Film film){
-       try {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
+
            validate(film);
-           if (!films.containsKey(film.getId())) {
+           if (!checkFilm(film)) {
                film.setId(id++);
                films.put(film.getId(), film);
                log.info("Фильм " + film.getName() + " добавлен");
+               return film;
            } else {
-               log.info("Такой фильм уже добавлен");
-
+               log.warn(film.getName());
+               throw new ValidationException("Такой фильм уже добавлен");
            }
-       } catch (ValidationException e){
-           log.info("Ошибка при добавлении фильма");
-       }
-        return film;
-    }
 
+    }
+    public boolean checkFilm(Film film){
+        for (Film film1:films.values()){
+            if (film.getName().equals(film1.getName())){
+                return false;
+            }
+        }
+        return true;
+    }
     @PutMapping
-        public Film put(@RequestBody Film film){
-        try {
+        public Film put(@RequestBody Film film) throws ValidationException {
             validate(film);
-            if (films.containsKey(film.getId())) {
+            if (checkFilm(film)) {
                 films.remove(film.getId());
                 films.put(film.getId(), film);
                 log.info("Информация о фильме обновлена");
+                return film;
             } else {
-                log.info("Нет такого фильма");
+                log.warn(film.getName());
+                throw new ValidationException("Нет такого фильма");
             }
-        } catch (ValidationException e){
-            log.info("Ошибка обновления данных о фильме");
-        }
-        return film;
     }
     public static void validate(@Valid @RequestBody Film film) throws ValidationException {
       if (film.getReleaseDate().isBefore(MIN_DATE) || film.getDuration()<=0){
-          log.info("Дата "+film.getReleaseDate()+" / Длительность "+film.getDuration());
+          log.warn("Дата "+film.getReleaseDate()+" / Длительность "+film.getDuration());
           throw new ValidationException("Ошибка даты/длительности");
       }
     }
