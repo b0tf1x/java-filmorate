@@ -28,7 +28,7 @@ private Map<Integer,Film> films = new HashMap<>();
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
 
            validate(film);
-           if (!checkFilm(film)) {
+           if (checkFilm(film)) {
                film.setId(id++);
                films.put(film.getId(), film);
                log.info("Фильм " + film.getName() + " добавлен");
@@ -50,7 +50,7 @@ private Map<Integer,Film> films = new HashMap<>();
     @PutMapping
         public Film put(@RequestBody Film film) throws ValidationException {
             validate(film);
-            if (checkFilm(film)) {
+            if (films.containsKey(film.getId())) {
                 films.remove(film.getId());
                 films.put(film.getId(), film);
                 log.info("Информация о фильме обновлена");

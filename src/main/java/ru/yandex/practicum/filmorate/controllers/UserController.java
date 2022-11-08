@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private int id = 1;
-    private final Map<Integer,User> users = new HashMap<>();
+    private Map<Integer,User> users = new HashMap<>();
     @GetMapping
     public Collection<User> findAll(){
         log.info("Текущее количество постов "+users.size());
@@ -25,7 +25,7 @@ public class UserController {
     public User create(@Valid @RequestBody User user) throws ValidationException {
 
         validate(user);
-        if (!users.containsKey(user.getId())) {
+        if (checkUsers(user)) {
             user.setId(id++);
             users.put(user.getId(), user);
             log.info("Пользователь " + user.getLogin() + " добавлен");
@@ -35,7 +35,14 @@ public class UserController {
             throw new ValidationException("Такой пользователь уже добавлен");
         }
     }
-
+   public boolean checkUsers(User user){
+        for (User user1 : users.values()){
+            if (user1.getLogin().equals(user.getLogin()) || user1.getEmail().equals(user.getEmail())){
+                return false;
+            }
+        }
+        return true;
+   }
 
 
     @PutMapping
@@ -54,7 +61,7 @@ public class UserController {
     }
     public static void validate(@Valid @RequestBody User user) throws ValidationException {
         if (user.getLogin().contains(" ")){
-            log.warn("User login = "+user.getLogin());
+            log.warn("User login = "+user.getId());
             throw new ValidationException("Логин содержит пробел");
         }
         if (user.getName()==null){
