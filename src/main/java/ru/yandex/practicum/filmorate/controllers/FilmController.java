@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/films")
 public class FilmController {
     private static final LocalDate MIN_DATE = LocalDate.of(1895, 12, 28);
