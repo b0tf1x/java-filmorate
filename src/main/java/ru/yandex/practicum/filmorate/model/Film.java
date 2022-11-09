@@ -10,13 +10,17 @@ import java.time.LocalDate;
 @Data
 public class Film {
     private int id;
+
     @NotNull
     @NotBlank
     private final String name;
+
     @Size(max = 200, message = "слишком длинное описание")
     private final String description;
+
     @NotNull
     private final LocalDate releaseDate;
+
     @NotNull
     private final long duration;
 }
