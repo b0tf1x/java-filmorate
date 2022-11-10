@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FilmControllerTest {
-    FilmController filmController = new FilmController();
+    private FilmController filmController = new FilmController();
 
     @Test
     public void testDuration() {

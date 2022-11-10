@@ -45,13 +45,8 @@ public class FilmController {
     }
 
     public boolean checkFilm(Film film) {
-        Collection<Film> collectionFilms = films.values();
-        boolean check = collectionFilms.stream()
-                .anyMatch(film1 -> film1.getName().equals(film.getName()));
-        if (check) {
-            return false;
-        }
-        return true;
+        return films.values().stream()
+                .noneMatch(filmToCompare -> filmToCompare.getName().equals(film.getName()));
     }
 
     @PutMapping

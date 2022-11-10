@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserControllerTest {
-    UserController userController = new UserController();
+    private UserController userController = new UserController();
 
     @Test
     public void testLoginWithSpace() {
@@ -23,14 +23,11 @@ class UserControllerTest {
     }
 
     @Test
-    public void testNullName() {
+    public void testNullName() throws ValidationException {
         User user = new User("@123", "123", LocalDate.of(2010, 10, 10));
         user.setId(1);
-        try {
-            userController.create(user);
-            assertEquals(user.getLogin(), user.getName());
-        } catch (Exception e) {
-        }
+        userController.create(user);
+        assertEquals(user.getLogin(), user.getName());
     }
 
     @Test

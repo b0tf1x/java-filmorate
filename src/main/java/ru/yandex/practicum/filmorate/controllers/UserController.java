@@ -43,13 +43,8 @@ public class UserController {
     }
 
     public boolean checkUsers(User user) {
-        Collection<User> collectionUsers = users.values();
-        boolean check = collectionUsers.stream()
-                .anyMatch(user1 -> user1.getLogin().equals(user.getLogin()) || user1.getEmail().equals(user.getEmail()));
-        if (check) {
-            return false;
-        }
-        return true;
+        return users.values().stream()
+                .noneMatch(userToCompare -> userToCompare.getName().equals(user.getName()) || userToCompare.getEmail().equals(user.getEmail()));
     }
 
 
