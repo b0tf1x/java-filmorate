@@ -76,12 +76,13 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    private void validate(User user) {
+    public User validate(User user) {
         if (user.getLogin().contains(" ")) {
             throw new ValidationException("Логин содержит пробел");
         }
-        if (user.getName().isEmpty() || user.getName().isBlank()) {
+        if (user.getName()==null || user.getName().isBlank() || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
+        return user;
     }
 }
