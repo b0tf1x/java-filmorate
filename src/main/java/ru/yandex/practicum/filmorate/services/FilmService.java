@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storages.FilmStorage;
 import ru.yandex.practicum.filmorate.storages.InMemoryFilmStorage;
 
 import java.util.Collection;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class FilmService {
-    InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
+   FilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
 
     public Collection<Film> findAll() {
         return inMemoryFilmStorage.findAll();

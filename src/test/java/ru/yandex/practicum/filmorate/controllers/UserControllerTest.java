@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserControllerTest {
-    private UserController userController = new UserController();
+    private final UserController userController = new UserController();
 
     @Test
     public void testLoginWithSpace() {

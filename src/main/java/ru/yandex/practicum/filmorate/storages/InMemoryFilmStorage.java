@@ -55,12 +55,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private boolean checkFilm(Film film) {
-        if (!films.values().stream()
-                .noneMatch(filmToCompare -> filmToCompare.getName().equals(film.getName()))) {
+        if (films.values().stream()
+                .anyMatch(filmToCompare -> filmToCompare.getName().equals(film.getName()))) {
             throw new InternalException("Такой фильм уже есть");
         }
-        return films.values().stream()
-                .noneMatch(filmToCompare -> filmToCompare.getName().equals(film.getName()));
+        return !films.values().stream()
+                .anyMatch(filmToCompare -> filmToCompare.getName().equals(film.getName()));
     }
 
     @Override

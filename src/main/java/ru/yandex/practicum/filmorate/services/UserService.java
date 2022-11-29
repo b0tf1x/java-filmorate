@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storages.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storages.UserStorage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
+    private final UserStorage inMemoryUserStorage = new InMemoryUserStorage();
 
     public Collection<User> findAll() {
         return inMemoryUserStorage.findAll();
