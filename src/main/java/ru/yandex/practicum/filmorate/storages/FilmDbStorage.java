@@ -2,13 +2,16 @@ package ru.yandex.practicum.filmorate.storages;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.FilmException;
 import ru.yandex.practicum.filmorate.exceptions.UserException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
@@ -75,10 +78,10 @@ private List<Genre> getGenres(int id){
     }
     @Override
     public Film create(Film film){
+        validate(film);
         final String sqlQuery = "insert into films (name, description, release_date, duration) " +
-                "values (?, ?, ?, ?)";
+                "values (?, ?, ?, ?) ";
         KeyHolder generatedId = new GeneratedKeyHolder();
-
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
             stmt.setString(1, film.getName());
@@ -88,21 +91,22 @@ private List<Genre> getGenres(int id){
             return stmt;
         }, generatedId);
         film.setId(Objects.requireNonNull(generatedId.getKey()).intValue());
-     final String mpaSqlQuery = "INSERT INTO mpa_films (film_id, mpa_id) VALUES (?, ?)";
+     final String mpaSqlQuery = "insert into mpa_films (film_id, mpa_id) VALUES (?, ?)";
         log.info("filmid "+film.getId() +" mpaid "+film.getMpa().getId());
      jdbcTemplate.update(mpaSqlQuery, film.getId(), film.getMpa().getId());
      final String getGenresSqlQuery = "insert into film_genre (film_id, genre_id) values (?, ?)";
-        if (film.getGenre() != null) {
-            for (Genre g : film.getGenre()) {
+        if (film.getGenres() != null) {
+            for (Genre g : film.getGenres()) {
                 jdbcTemplate.update(getGenresSqlQuery, film.getId(), g.getId());
             }
         }
         film.setMpa(getMpa(film.getId()));
-        film.setGenre(getGenres(film.getId()));
+        film.setGenres(getGenres(film.getId()));
         return film;
     }
     @Override
     public Film put(Film film){
+        validate(film);
     final String checkQuery="select * from films where id = ?";
     SqlRowSet filmRowSet = jdbcTemplate.queryForRowSet(checkQuery,film.getId());
     if (!filmRowSet.next()){
@@ -110,11 +114,11 @@ private List<Genre> getGenres(int id){
     }
     final String query = "update films set name = ?, description = ?, release_date = ?, duration = ? "+
             "where id = ?";
-    if (film.getGenre()!=null){
+    if (film.getGenres()!=null){
         final String delete = "delete from film_genre where film_id=?";
         jdbcTemplate.update(delete,film.getId());
         final String update = "insert into film_genre(film_id, genre_id) values(?,?)";
-        for (Genre genre : film.getGenre()){
+        for (Genre genre : film.getGenres()){
             String checkExists= "select * from film_genre where film_id = ? and genre_id=?";
             SqlRowSet checkExistsRow = jdbcTemplate.queryForRowSet(checkExists,film.getId(),genre.getId());
             if (!checkExistsRow.next()){
@@ -130,10 +134,9 @@ private List<Genre> getGenres(int id){
        final String update = "insert into mpa_films(film_id, mpa_id) values(?,?)";
        jdbcTemplate.update(update,film.getId(),film.getMpa().getId());
     }
-    jdbcTemplate.update(query,film.getName(),film.getDescription(),film.getReleaseDate(),
-            film.getDuration(),film.getId());
+    jdbcTemplate.update(query,film.getName(),film.getDescription(),film.getReleaseDate(), film.getDuration(),film.getId());
             film.setMpa(getMpa(film.getId()));
-            film.setGenre(getGenres(film.getId()));
+            film.setGenres(getGenres(film.getId()));
     return film;
 }
     @Override
@@ -187,7 +190,12 @@ private List<Genre> getGenres(int id){
     final String query = "select id, name,description,release_date,duration from films "+
             "left join films_likes as fl on films.id=fl.film_id "+
             "group by films.id, fl.film_id in (select film_id from films_likes) "+
-            "order by count(fl.film_id) desc limit ?";
+            "order by count(fl.film_id) asc limit ?";
     return jdbcTemplate.query(query, this::createFilm,count);
+    }
+    private void validate(Film film){
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))){
+            throw new ValidationException("Недопустимая дата");
+        }
     }
 }

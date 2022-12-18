@@ -10,11 +10,11 @@ import ru.yandex.practicum.filmorate.storages.FilmStorage;
 import java.util.Collection;
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
+@Service
 public class FilmService {
-   FilmStorage filmStorage;
+   private final FilmStorage filmStorage;
 
     public Collection<Film> findAll() {
         return filmStorage.findAll();

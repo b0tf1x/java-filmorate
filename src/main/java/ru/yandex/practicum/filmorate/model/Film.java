@@ -22,14 +22,14 @@ public class Film {
     @PositiveOrZero
     private int id;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, long duration, MPA mpa, List<Genre> genre) {
+    public Film(int id, String name, String description, LocalDate releaseDate, long duration, MPA mpa, List<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
-        this.genre = genre;
+        this.genres = genres;
     }
 
     @NotBlank
@@ -43,7 +43,7 @@ public class Film {
     @Min(value = 1, message = "некорректная длина")
     @Positive
     private long duration;
-    private List<Genre> genre;
+    private List<Genre> genres;
     private MPA mpa;
 
 }

@@ -29,10 +29,8 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     @Override
     public Collection<User> findAll() {
-
             final String sqlQuery = "select * from users";
             return jdbcTemplate.query(sqlQuery, this::createUser);
-
     }
         private User createUser(ResultSet resultSet, int rowNum) throws SQLException {
             final int id=resultSet.getInt("id");
@@ -45,7 +43,7 @@ public class UserDbStorage implements UserStorage {
         }
         @Override
         public User create(User user){
-        final String sqlQuery = "insert into users(email,login,name,birthday) values(?,?,?,?)";
+        final String sqlQuery = "insert into users(email,login,name,birthday) values(?,?,?,?) ";
         KeyHolder generatedId = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 final PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});

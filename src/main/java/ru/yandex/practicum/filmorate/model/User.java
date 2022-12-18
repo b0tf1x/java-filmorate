@@ -32,16 +32,13 @@ public class User {
     @NotNull
     @Email
     private String email;
-
     @NotNull
     @NotBlank
     private String login;
     private String name;
-
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-
     public User(int id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
         this.email = email;

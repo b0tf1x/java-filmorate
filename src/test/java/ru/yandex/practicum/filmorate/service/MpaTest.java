@@ -24,7 +24,7 @@ public class MpaTest {
         Assertions.assertThat(mpaRatingStorage)
                 .isNotEmpty()
                 .extracting(MPA::getName)
-                .containsAll(Arrays.asList("A", "PG", "PG-13", "R", "NC-17"));
+                .containsAll(Arrays.asList("G", "PG", "PG-13", "R", "NC-17"));
     }
 
     @Test
