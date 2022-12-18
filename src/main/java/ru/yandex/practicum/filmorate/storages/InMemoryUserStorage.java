@@ -12,8 +12,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
-@Slf4j
+
+/**@Slf4j
 public class InMemoryUserStorage implements UserStorage {
 
     private int id = 1;
@@ -85,4 +85,4 @@ public class InMemoryUserStorage implements UserStorage {
         }
         return user;
     }
-}
+}**/

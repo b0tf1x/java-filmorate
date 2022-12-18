@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controllers;
+/**package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -31,4 +31,4 @@ class FilmControllerTest {
                 () -> filmController.create(film));
         assertEquals(ValidationException.class, exception.getClass());
     }
-}
+}**/

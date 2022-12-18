@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService = new UserService();
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -53,12 +53,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public List<User> addFriend(@PathVariable int id, @PathVariable int friendId) {
+    public List<Integer> addFriend(@PathVariable int id, @PathVariable int friendId) {
         return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public List<User> removeFriend(@PathVariable int id, @PathVariable int friendId) {
+    public List<Integer> removeFriend(@PathVariable int id, @PathVariable int friendId) {
         return userService.removeFriend(id, friendId);
     }
 

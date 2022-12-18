@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storages;
+/**package ru.yandex.practicum.filmorate.storages;
 
 import com.sun.jdi.InternalException;
 import lombok.Getter;
@@ -79,4 +79,4 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new ValidationException("Ошибка даты/длительности");
         }
     }
-}
+}**/

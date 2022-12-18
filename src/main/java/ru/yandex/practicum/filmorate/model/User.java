@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @PositiveOrZero
     private int id;
@@ -27,15 +31,22 @@ public class User {
 
     @NotNull
     @Email
-    private final String email;
+    private String email;
 
     @NotNull
     @NotBlank
-    private final String login;
+    private String login;
     private String name;
 
     @NotNull
     @PastOrPresent
-    private final LocalDate birthday;
+    private LocalDate birthday;
 
+    public User(int id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
 }
