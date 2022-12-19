@@ -15,12 +15,14 @@ import java.util.Collection;
 @RequestMapping("/genres")
 public class GenreController {
     private final GenreService genreService;
+
     @GetMapping
-    public Collection<Genre>findAll(){
+    public Collection<Genre> findAll() {
         return genreService.findAll();
     }
+
     @GetMapping("/{id}")
-    public Genre getById(@PathVariable int id){
+    public Genre getById(@PathVariable int id) {
         return genreService.getById(id);
     }
 }

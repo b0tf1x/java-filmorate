@@ -15,7 +15,7 @@ import java.util.Collection;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class GenreDbStorage implements  GenreStorage {
+public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -24,11 +24,13 @@ public class GenreDbStorage implements  GenreStorage {
 
         return jdbcTemplate.query(sqlQuery, this::createGenre);
     }
+
     private Genre createGenre(ResultSet resultSet, int rowNum) throws SQLException {
         int id = resultSet.getInt("genre_id");
         String name = resultSet.getString("genre_name");
         return new Genre(id, name);
     }
+
     @Override
     public Genre getById(int id) {
         final String sqlQuery = "select * from genre where genre_id = ? ";

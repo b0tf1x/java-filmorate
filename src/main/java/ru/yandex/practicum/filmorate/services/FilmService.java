@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class FilmService {
-   private final FilmStorage filmStorage;
+    private final FilmStorage filmStorage;
 
     public Collection<Film> findAll() {
         return filmStorage.findAll();
@@ -37,11 +37,11 @@ public class FilmService {
     }
 
     public Film addLike(int userId, int filmId) {
-        return filmStorage.addLike(userId,filmId);
+        return filmStorage.addLike(userId, filmId);
     }
 
     public Film removeLike(int userId, int filmId) {
-    return filmStorage.removeLike(userId,filmId);
+        return filmStorage.removeLike(userId, filmId);
     }
 
     public List<Film> getTop(int count) {

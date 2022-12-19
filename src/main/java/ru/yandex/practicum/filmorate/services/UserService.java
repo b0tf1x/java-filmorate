@@ -38,11 +38,11 @@ public class UserService {
     }
 
     public List<Integer> addFriend(int firstId, int secondId) {
-       return userStorage.addFriend(firstId,secondId);
+        return userStorage.addFriend(firstId, secondId);
     }
 
     public List<Integer> removeFriend(int firstId, int secondId) {
-        return userStorage.removeFriend(firstId,secondId);
+        return userStorage.removeFriend(firstId, secondId);
     }
 
     public List<User> getFriends(int id) {
@@ -50,8 +50,9 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int firstId, int secondId) {
-        return userStorage.getCommonFriends(firstId,secondId);
+        return userStorage.getCommonFriends(firstId, secondId);
     }
+
     private void validate(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());

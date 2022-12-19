@@ -15,18 +15,21 @@ import java.util.Collection;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class MpaDbStorage implements MpaStorage{
+public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
+
     @Override
-    public Collection<MPA>findAll(){
-        String query="select * from mpa";
+    public Collection<MPA> findAll() {
+        String query = "select * from mpa";
         return jdbcTemplate.query(query, this::createMpa);
     }
-    private MPA createMpa(ResultSet resultSet, int rowNum) throws SQLException{
+
+    private MPA createMpa(ResultSet resultSet, int rowNum) throws SQLException {
         int id = resultSet.getInt("mpa_id");
         String name = resultSet.getString("name");
-        return new MPA(id,name);
+        return new MPA(id, name);
     }
+
     @Override
     public MPA getById(int id) {
         String sqlQuery = "select * from mpa where mpa_id = ?";

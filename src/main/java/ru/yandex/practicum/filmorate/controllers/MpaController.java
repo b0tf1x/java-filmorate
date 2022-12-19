@@ -15,12 +15,14 @@ import java.util.Collection;
 @RequestMapping("/mpa")
 public class MpaController {
     private final MpaService mpaService;
+
     @GetMapping
-    public Collection<MPA> findAll(){
+    public Collection<MPA> findAll() {
         return mpaService.findAll();
     }
+
     @GetMapping("/{id}")
-    public MPA getById(@PathVariable int id){
+    public MPA getById(@PathVariable int id) {
         return mpaService.getById(id);
     }
 }

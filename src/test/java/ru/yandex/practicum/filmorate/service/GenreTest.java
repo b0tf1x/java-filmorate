@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
+
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,13 +17,15 @@ import java.util.Arrays;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GenreTest {
     private final GenreService genre;
+
     @Test
     public void testGetAllGenres() {
 
         Collection<Genre> genreStorage = genre.findAll();
         Assertions.assertThat(genreStorage)
                 .extracting(Genre::getName)
-                .containsAll(Arrays.asList("Комедия", "Драма", "Мультфильм", "Триллер", "Документальный", "Боевик"));}
+                .containsAll(Arrays.asList("Комедия", "Драма", "Мультфильм", "Триллер", "Документальный", "Боевик"));
+    }
 
     @Test
     public void testGetGenreById() {
