@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class MPA {
+public class Mpa {
     private int id;
     private String name;
 }

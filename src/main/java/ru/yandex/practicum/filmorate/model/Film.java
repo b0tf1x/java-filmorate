@@ -11,9 +11,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +20,7 @@ public class Film {
     @PositiveOrZero
     private int id;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, long duration, MPA mpa, List<Genre> genres) {
+    public Film(int id, String name, String description, LocalDate releaseDate, long duration, Mpa mpa, List<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -44,6 +42,6 @@ public class Film {
     @Positive
     private long duration;
     private List<Genre> genres;
-    private MPA mpa;
+    private Mpa mpa;
 
 }

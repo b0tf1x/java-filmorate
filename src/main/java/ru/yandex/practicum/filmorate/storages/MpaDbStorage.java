@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.FilmException;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,19 +19,19 @@ public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Collection<MPA> findAll() {
+    public Collection<Mpa> findAll() {
         String query = "select * from mpa";
         return jdbcTemplate.query(query, this::createMpa);
     }
 
-    private MPA createMpa(ResultSet resultSet, int rowNum) throws SQLException {
+    private Mpa createMpa(ResultSet resultSet, int rowNum) throws SQLException {
         int id = resultSet.getInt("mpa_id");
         String name = resultSet.getString("name");
-        return new MPA(id, name);
+        return new Mpa(id, name);
     }
 
     @Override
-    public MPA getById(int id) {
+    public Mpa getById(int id) {
         String sqlQuery = "select * from mpa where mpa_id = ?";
         SqlRowSet mpaRowSet = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (!mpaRowSet.next()) {

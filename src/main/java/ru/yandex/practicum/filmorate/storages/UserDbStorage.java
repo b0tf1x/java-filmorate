@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storages;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -21,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -40,8 +40,7 @@ public class UserDbStorage implements UserStorage {
         final String login = resultSet.getString("login");
         final String name = resultSet.getString("name");
         final LocalDate birthday = resultSet.getDate("birthday").toLocalDate();
-        User user = new User(id, email, login, name, birthday);
-        return user;
+        return new User(id, email, login, name, birthday);
     }
 
     @Override
@@ -56,18 +55,21 @@ public class UserDbStorage implements UserStorage {
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
             return stmt;
         }, generatedId);
-        user.setId(generatedId.getKey().intValue());
+        user.setId(Objects.requireNonNull(generatedId.getKey().intValue()));
         log.info("Пользователь с почтой +" + user.getEmail());
         return user;
+    }
+    private void checkExists(int id){
+        final String checkQuery = "select * from users where id = ?";
+        SqlRowSet userRowSet = jdbcTemplate.queryForRowSet(checkQuery, id);
+        if (!userRowSet.next()) {
+            throw new UserException("Пользователь не найден");
+        }
     }
 
     @Override
     public User put(User user) {
-        final String checkQuery = "select * from users where id = ?";
-        SqlRowSet userRowSet = jdbcTemplate.queryForRowSet(checkQuery, user.getId());
-        if (!userRowSet.next()) {
-            throw new UserException("Пользователь не найден");
-        }
+       checkExists(user.getId());
         log.info("email = " + user.getEmail() + " login= " + user.getLogin() + " name = " + user.getName() + " birthday= " + user.getBirthday() + " id = " + user.getId());
         final String query = "UPDATE users SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? where id = ?";
         jdbcTemplate.update(query,
@@ -78,10 +80,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(int id) {
         String checkExists = "select * from users where id=?";
-        SqlRowSet userRowSet = jdbcTemplate.queryForRowSet(checkExists, id);
-        if (!userRowSet.next()) {
-            throw new UserException("Пользователь не найден");
-        }
+        checkExists(id);
         return jdbcTemplate.queryForObject(checkExists, this::createUser, id);
     }
 
@@ -95,7 +94,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Map<Integer, User> getUsers() {
-        Map<Integer, User> userMap = new HashMap();
+        Map<Integer, User> userMap = new HashMap<>();
         final String query = "select * from users";
         Collection<User> users = jdbcTemplate.query(query, this::createUser);
         for (User user : users) {
@@ -106,7 +105,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Integer> addFriend(int firstId, int secondId) {
-        validate(firstId, secondId);
         final String query = "insert into friends(user_id,friend_id,friendship_status) values(?,?,?)";
         final String statusQuery = "update friends set friendship_status = ? where user_id=? and friend_id=?";
         final String check = "select * from friends where user_id=? and friend_id=?";
@@ -121,7 +119,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Integer> removeFriend(int firstId, int secondId) {
-        validate(firstId, secondId);
         final String query = "delete from friends where user_id=? and friend_id=?";
         jdbcTemplate.update(query, firstId, secondId);
         return List.of(firstId, secondId);
@@ -142,21 +139,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getCommonFriends(int firstId, int secondId) {
-        validate(firstId, secondId);
         final String query = "select id, email,login, name, birthday from friends as f " +
                 "left join users on users.id=f.friend_id where f.user_id=? and f.friend_id " +
                 "in (select friend_id from friends as f left join users on users.id=f.friend_id " +
                 "where f.user_id=?)";
         return jdbcTemplate.query(query, this::createUser, firstId, secondId);
-    }
-
-    private void validate(int firstId, int secondId) {
-        final String checkExists = "select * from users where id = ?";
-        SqlRowSet firstRowSet = jdbcTemplate.queryForRowSet(checkExists, firstId);
-        SqlRowSet secondRowSet = jdbcTemplate.queryForRowSet(checkExists, secondId);
-        if (!firstRowSet.next() || !secondRowSet.next()) {
-            throw new UserException("Один или несколько пользователей не найден(ы)");
-        }
     }
 
 

@@ -2,19 +2,15 @@ package ru.yandex.practicum.filmorate.storages;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.FilmException;
-import ru.yandex.practicum.filmorate.exceptions.UserException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -32,18 +28,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+    private static final String SELECT_FILMS = "select * from films";
 
     @Override
     public Collection<Film> findAll() {
-        final String sqlQuery = "select * from films";
-        return jdbcTemplate.query(sqlQuery, this::createFilm);
+        return jdbcTemplate.query(SELECT_FILMS, this::createFilm);
     }
 
     @Override
     public Map<Integer, Film> getFilms() {
-        Map<Integer, Film> filmsMap = new HashMap();
-        final String sqlQuery = "select * from films";
-        Collection<Film> films = jdbcTemplate.query(sqlQuery, this::createFilm);
+        Map<Integer, Film> filmsMap = new HashMap<>();
+        Collection<Film> films = jdbcTemplate.query(SELECT_FILMS, this::createFilm);
         for (Film film : films) {
             filmsMap.put(film.getId(), film);
         }
@@ -59,16 +54,16 @@ public class FilmDbStorage implements FilmStorage {
         return new Film(id, name, description, releaseDate, duration, getMpa(id), getGenres(id));
     }
 
-    private MPA getMpa(int id) {
+    private Mpa getMpa(int id) {
         final String getMpaSqlQuery = "select mpa.mpa_id, name from mpa " +
                 "left join mpa_films as mf on mpa.mpa_id=mf.mpa_id where film_id=?";
         return jdbcTemplate.queryForObject(getMpaSqlQuery, this::createMpa, id);
     }
 
-    private MPA createMpa(ResultSet resultSet, int rowNum) throws SQLException {
+    private Mpa createMpa(ResultSet resultSet, int rowNum) throws SQLException {
         final int id = resultSet.getInt("mpa_id");
         final String name = resultSet.getString("name");
-        return new MPA(id, name);
+        return new Mpa(id, name);
     }
 
     private List<Genre> getGenres(int id) {
@@ -86,7 +81,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        validate(film);
         final String sqlQuery = "insert into films (name, description, release_date, duration) " +
                 "values (?, ?, ?, ?) ";
         KeyHolder generatedId = new GeneratedKeyHolder();
@@ -113,14 +107,17 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    @Override
-    public Film put(Film film) {
-        validate(film);
+    private void checkExists(int id) {
         final String checkQuery = "select * from films where id = ?";
-        SqlRowSet filmRowSet = jdbcTemplate.queryForRowSet(checkQuery, film.getId());
+        SqlRowSet filmRowSet = jdbcTemplate.queryForRowSet(checkQuery, id);
         if (!filmRowSet.next()) {
             throw new FilmException("Фильм не найден");
         }
+    }
+
+    @Override
+    public Film put(Film film) {
+        checkExists(film.getId());
         final String query = "update films set name = ?, description = ?, release_date = ?, duration = ? " +
                 "where id = ?";
         if (film.getGenres() != null) {
@@ -152,10 +149,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getById(int id) {
         String checkExists = "select * from films where id=?";
-        SqlRowSet filmRowSet = jdbcTemplate.queryForRowSet(checkExists, id);
-        if (!filmRowSet.next()) {
-            throw new FilmException("Фильм не найден");
-        }
+        checkExists(id);
         return jdbcTemplate.queryForObject(checkExists, this::createFilm, id);
     }
 
@@ -173,7 +167,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film addLike(int filmId, int userId) {
-        validate(filmId, userId);
         final String query = "insert into films_likes(film_id,user_id) values(?, ?)";
         jdbcTemplate.update(query, filmId, userId);
         return getById(filmId);
@@ -181,24 +174,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film removeLike(int filmId, int userId) {
-        validate(filmId, userId);
         final String query = "delete from films_likes where film_id=? and user_id=?";
         jdbcTemplate.update(query, filmId, userId);
         return getById(filmId);
     }
 
-    private void validate(int filmId, int userId) {
-        final String checkExistsFilm = "select * from films where id = ?";
-        SqlRowSet filmRowSet = jdbcTemplate.queryForRowSet(checkExistsFilm, filmId);
-        final String checkExistsUser = "select * from users where id = ?";
-        SqlRowSet userRowSet = jdbcTemplate.queryForRowSet(checkExistsUser, userId);
-        if (!userRowSet.next()) {
-            throw new UserException("Пользователь не найден");
-        }
-        if (!filmRowSet.next()) {
-            throw new FilmException("Фильм не найден");
-        }
-    }
 
     @Override
     public List<Film> getTop(int count) {
@@ -209,9 +189,5 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(query, this::createFilm, count);
     }
 
-    private void validate(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Недопустимая дата");
-        }
-    }
+
 }
