@@ -20,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @AutoConfigureTestDatabase
 class FilmControllerTest {
-    private final FilmController filmController = new FilmController(new FilmService(new FilmDbStorage(new JdbcTemplate())));
+
+    private final FilmController filmController = new FilmController(new FilmService(new FilmDbStorage(new JdbcTemplate()),new JdbcTemplate()));
 
     @Test
     public void testDuration() {

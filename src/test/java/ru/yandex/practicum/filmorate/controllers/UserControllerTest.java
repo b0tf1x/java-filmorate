@@ -1,24 +1,29 @@
-/**package ru.yandex.practicum.filmorate.controllers;
+package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storages.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storages.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.services.UserService;
+import ru.yandex.practicum.filmorate.storages.UserDbStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
+@AutoConfigureTestDatabase
 class UserControllerTest {
-    private final UserController userController = new UserController();
+    @Autowired
+    private UserController userController = new UserController(new UserService(new UserDbStorage(new JdbcTemplate()),new JdbcTemplate()));
 
     @Test
     public void testLoginWithSpace() {
-        User user = new User("@123", "123 432", LocalDate.of(2010, 10, 10));
-        user.setName("abc");
-        user.setId(1);
+        User user = new User(1, "email", "log in", "name", LocalDate.of(2010, 10, 10));
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> userController.create(user));
@@ -27,10 +32,8 @@ class UserControllerTest {
 
     @Test
     public void testNullName() throws ValidationException {
-        InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
-        User user = new User("@123", "123", LocalDate.of(2010, 10, 10));
-        user.setId(1);
-        user = inMemoryUserStorage.validate(user);
+        User user = new User(1, "email", "login", null, LocalDate.of(2010, 10, 10));
+        user = userController.create(user);
         userController.create(user);
         assertEquals(user.getLogin(), user.getName());
     }
@@ -42,4 +45,4 @@ class UserControllerTest {
                 () -> userController.create(null));
         assertEquals(NullPointerException.class, exception.getClass());
     }
-}**/
+}
