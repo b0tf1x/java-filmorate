@@ -59,7 +59,8 @@ public class UserDbStorage implements UserStorage {
         log.info("Пользователь с почтой +" + user.getEmail());
         return user;
     }
-    private void checkExists(int id){
+
+    private void checkExists(int id) {
         final String checkQuery = "select * from users where id = ?";
         SqlRowSet userRowSet = jdbcTemplate.queryForRowSet(checkQuery, id);
         if (!userRowSet.next()) {
@@ -69,7 +70,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User put(User user) {
-       checkExists(user.getId());
+        checkExists(user.getId());
         log.info("email = " + user.getEmail() + " login= " + user.getLogin() + " name = " + user.getName() + " birthday= " + user.getBirthday() + " id = " + user.getId());
         final String query = "UPDATE users SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? where id = ?";
         jdbcTemplate.update(query,
