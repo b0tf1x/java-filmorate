@@ -67,7 +67,14 @@ public class UserDbStorage implements UserStorage {
             throw new UserException("Пользователь не найден");
         }
     }
-
+    private void validate(int firstId, int secondId) {
+        final String checkExists = "select * from users where id = ?";
+        SqlRowSet firstRowSet = jdbcTemplate.queryForRowSet(checkExists, firstId);
+        SqlRowSet secondRowSet = jdbcTemplate.queryForRowSet(checkExists, secondId);
+        if (!firstRowSet.next() || !secondRowSet.next()) {
+            throw new UserException("Один или несколько пользователей не найден(ы)");
+        }
+    }
     @Override
     public User put(User user) {
         checkExists(user.getId());
@@ -106,6 +113,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Integer> addFriend(int firstId, int secondId) {
+        validate(firstId,secondId);
         final String query = "insert into friends(user_id,friend_id,friendship_status) values(?,?,?)";
         final String statusQuery = "update friends set friendship_status = ? where user_id=? and friend_id=?";
         final String check = "select * from friends where user_id=? and friend_id=?";
@@ -120,6 +128,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Integer> removeFriend(int firstId, int secondId) {
+        validate(firstId,secondId);
         final String query = "delete from friends where user_id=? and friend_id=?";
         jdbcTemplate.update(query, firstId, secondId);
         return List.of(firstId, secondId);
@@ -140,6 +149,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getCommonFriends(int firstId, int secondId) {
+        validate(firstId,secondId);
         final String query = "select id, email,login, name, birthday from friends as f " +
                 "left join users on users.id=f.friend_id where f.user_id=? and f.friend_id " +
                 "in (select friend_id from friends as f left join users on users.id=f.friend_id " +

@@ -8,6 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.FilmException;
+import ru.yandex.practicum.filmorate.exceptions.UserException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -167,6 +168,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film addLike(int filmId, int userId) {
+        validate(filmId, userId);
         final String query = "insert into films_likes(film_id,user_id) values(?, ?)";
         jdbcTemplate.update(query, filmId, userId);
         return getById(filmId);
@@ -174,6 +176,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film removeLike(int filmId, int userId) {
+        validate(filmId, userId);
         final String query = "delete from films_likes where film_id=? and user_id=?";
         jdbcTemplate.update(query, filmId, userId);
         return getById(filmId);
@@ -189,5 +192,17 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(query, this::createFilm, count);
     }
 
+    private void validate(int filmId, int userId) {
+        final String checkExistsFilm = "select * from films where id = ?";
+        SqlRowSet filmRowSet = jdbcTemplate.queryForRowSet(checkExistsFilm, filmId);
+        final String checkExistsUser = "select * from users where id = ?";
+        SqlRowSet userRowSet = jdbcTemplate.queryForRowSet(checkExistsUser, userId);
+        if (!userRowSet.next()) {
+            throw new UserException("Пользователь не найден");
+        }
+        if (!filmRowSet.next()) {
+            throw new FilmException("Фильм не найден");
+        }
+    }
 
 }

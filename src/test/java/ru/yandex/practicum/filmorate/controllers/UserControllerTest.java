@@ -4,11 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.services.UserService;
-import ru.yandex.practicum.filmorate.storages.UserDbStorage;
 
 import java.time.LocalDate;
 
@@ -18,10 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @AutoConfigureTestDatabase
 class UserControllerTest {
-    //Работает + проходит все тесты в Postman, но гит не пускает
-
-    /**@Autowired
-    private UserController userController = new UserController(new UserService(new UserDbStorage(new JdbcTemplate()),new JdbcTemplate()));
+    //без бд не проходит тесты
+    @Autowired
+    private UserController userController;
 
     @Test
     public void testLoginWithSpace() {
@@ -46,5 +42,5 @@ class UserControllerTest {
                 NullPointerException.class,
                 () -> userController.create(null));
         assertEquals(NullPointerException.class, exception.getClass());
-    }**/
+    }
 }
