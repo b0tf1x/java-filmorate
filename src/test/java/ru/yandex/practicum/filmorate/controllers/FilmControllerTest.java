@@ -1,21 +1,30 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+
+@SpringBootTest
+@AutoConfigureTestDatabase
 class FilmControllerTest {
-    private final FilmController filmController = new FilmController();
+    //без бд не проходит тесты
+    @Autowired
+    private FilmController filmController;
 
     @Test
     public void testDuration() {
-        Film film = new Film("abc", "123", LocalDate.of(2022, 10, 10), 0);
-        film.setId(1);
+        Film film = new Film(1, "test", "descr", LocalDate.of(2022, 1, 1), -1, new Mpa(1, "A"), List.of());
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> filmController.create(film));
@@ -24,8 +33,7 @@ class FilmControllerTest {
 
     @Test
     public void testDate() {
-        Film film = new Film("abc", "123", LocalDate.of(1895, 12, 27), 10);
-        film.setId(1);
+        Film film = new Film(2, "test", "descr", LocalDate.of(1700, 1, 1), 120, new Mpa(1, "A"), List.of());
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> filmController.create(film));

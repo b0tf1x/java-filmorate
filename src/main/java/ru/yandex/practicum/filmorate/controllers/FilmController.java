@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +20,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@Controller
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmService filmService = new FilmService();
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -55,7 +57,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getTop10(@RequestParam(defaultValue = "10", required = false) int count) {
-        return filmService.getTop10(count);
+        return filmService.getTop(count);
     }
 
 }
